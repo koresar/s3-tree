@@ -1,4 +1,4 @@
-# s3-tree
+# s3-tree [![Build Status](https://travis-ci.org/koresar/s3-tree.svg?branch=master)](https://travis-ci.org/koresar/s3-tree)
 Generates a tree of an S3 bucket contents
 
 WARNING! The number of HTTP calls are not optimized. Does a request per 'folder'.
