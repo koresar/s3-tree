@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var args = process.argv.slice(2);
+var bucket = args[0];
+var path = args[1] || '';
+
+if (!bucket) {
+  console.error('Error! Wrong arguments. Usage: s3-tree bucket-name [path]');
+  process.exit(1);
+}
+
+var s3tree = require('..');
+s3tree({bucket: bucket}).generate(path, function (error, tree) {
+  if (error) {
+    console.error(error.message);
+    process.exit(1);
+  }
+
+  console.log(JSON.stringify(tree, null, 2));
+});
