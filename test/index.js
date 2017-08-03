@@ -1,5 +1,6 @@
 var test = require('tape');
 var proxyquire = require('proxyquire');
+var Promise = require('bluebird');
 
 test('should throw if bucket name was not provided', function (t) {
   var s3tree = require('..');
@@ -23,52 +24,55 @@ test('should use s3-ls', function (t) {
 });
 
 test('should pass proper argument to the s3-ls', function (t) {
+  t.plan(1);
   var s3tree = proxyquire('..', {
     's3-ls': function s3ls() {
       return {
-        ls: function (path, callback) {
+        ls: function (path) {
           t.equal(path, '/');
-          callback(null, {files: [], folders: []});
+          return Promise.resolve({files: [], folders: []});
         }
       };
     }
   });
 
-  s3tree().generate('/', t.end);
+  s3tree().generate('/').catch(t.end);
 });
 
 test('should generate tree of files', function (t) {
+  t.plan(2);
   var s3tree = proxyquire('..', {
     's3-ls': function s3ls() {
       return {
-        ls: function (path, callback) {
+        ls: function (path) {
           t.equal(path, '/');
-          callback(null, {files: ['file1', 'file2'], folders: []});
+          return Promise.resolve({files: ['file1', 'file2'], folders: []});
         }
       };
     }
   });
 
-  s3tree().generate('/', function (error, tree) {
-    t.notOk(error);
+  s3tree().generate('/')
+  .then(function (tree) {
     t.deepEqual(tree, {
       file1: 'file1',
       file2: 'file2'
     });
-    t.end();
-  });
+  })
+  .catch(t.end);
 });
 
 test('should generate tree of folders and objects', function (t) {
+  t.plan(5);
   var counter = 0;
   var s3tree = proxyquire('..', {
     's3-ls': function s3ls() {
       return {
-        ls: function (path, callback) {
+        ls: function (path) {
           counter++;
           if (counter === 4) {
             t.equal(path, 'folder/sub-folder/sub-sub-folder/');
-            return callback(null, {
+            return Promise.resolve({
               files: ['folder/sub-folder/sub-sub-folder/file7', 'folder/sub-folder/sub-sub-folder/file8'],
               folders: []
             });
@@ -76,7 +80,7 @@ test('should generate tree of folders and objects', function (t) {
 
           if (counter === 3) {
             t.equal(path, 'folder/sub-folder/');
-            return callback(null, {
+            return Promise.resolve({
               files: ['folder/sub-folder/file5', 'folder/sub-folder/file6'],
               folders: ['folder/sub-folder/sub-sub-folder/']
             });
@@ -84,14 +88,14 @@ test('should generate tree of folders and objects', function (t) {
 
           if (counter === 2) {
             t.equal(path, 'folder/');
-            return callback(null, {
+            return Promise.resolve({
               files: ['folder/file3', 'folder/file4'],
               folders: ['folder/sub-folder/']
             });
           }
 
           t.equal(path, '/');
-          callback(null, {
+          return Promise.resolve({
             files: ['file1', 'file2'],
             folders: ['folder/']
           });
@@ -100,9 +104,8 @@ test('should generate tree of folders and objects', function (t) {
     }
   });
 
-  s3tree().generate('/', function (error, tree) {
-    t.notOk(error);
-
+  s3tree().generate('/')
+  .then(function (tree) {
     t.deepEqual(tree, {
       file1: 'file1',
       file2: 'file2',
@@ -119,6 +122,6 @@ test('should generate tree of folders and objects', function (t) {
         }
       }
     });
-    t.end();
-  });
+  })
+  .catch(t.end);
 });

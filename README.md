@@ -14,7 +14,8 @@ var s3tree = require('s3-tree');
 
 var generator = s3tree({bucket: 'my-bucket-name'});
 
-generator.generate('/my-folder/subfolder/', function (error, tree) {
+generator.generate('/my-folder/subfolder/')
+.then(function (tree) {
   console.log(JSON.stringify(tree, null, 2));
 });
 ```
@@ -45,12 +46,13 @@ The `s3tree` accepts two options:
 * `bucket` - Obligatory. The S3 bucket name
 * `s3` - Optional. The `aws-sdk` S3 class instance. For example: `new AWS.S3({apiVersion: '2006-03-01')` 
 
-The `s3tree.generate(path, callback)` function takes:
+The `s3tree.generate(path)` function takes:
 * `path` - any string. E.g. 
   *  `"/"`, `""`, or
   * `"/folder"`, `"folder/"`, `"folder"`, or
   * `"/1/2/3/4"`, `"1/2/3/4/"`, `"1/2/3/4"`, etc.
-* `callback` - node-style callback which resolves to a tree object.
+
+and returns a Promise. 
 
 # CLI
 
@@ -85,3 +87,14 @@ $ s3-tree my-bucket-name my-folder/subfolder/
 }
 $ 
 ```
+
+# CHANGELOG
+
+## v1.0
+* Node callbacks interface. No Promises. See README [here](https://github.com/koresar/s3-tree/tree/v1.0.1).
+* The deep dependency `aws-sdk` version was `>=2.0.0 <3.0.0`.
+
+## v2.0
+* Only promises are supported now. For node callbacks use `generator.generate(path).then(cb, cb)`
+* The deep dependency `aws-sdk` version is `>=2.3.0 <3.0.0` now.
+* node.js < v4 are not supported, unless you polyfill Promises `global.Promise = smthng;`

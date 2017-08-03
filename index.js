@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var async = require('async');
 var s3ls = require('s3-ls');
 
 function getLastPathPart(path) {
@@ -9,25 +8,22 @@ function getLastPathPart(path) {
 module.exports = function (options) {
   var lister = s3ls(options);
 
-  function generate(folder, callback) {
-    lister.ls(folder, function (error, data) {
-      if (error) return callback(error);
-
+  function generate(folder) {
+    return lister.ls(folder)
+    .then(function (data) {
       var tree = {};
       data.files.forEach(function (file) {
         tree[getLastPathPart(file)] = file;
       });
 
-      if (_.isEmpty(data.folders)) return callback(null, tree);
+      if (_.isEmpty(data.folders)) return Promise.resolve(tree);
 
-      var tasks = {};
-      data.folders.forEach(function (path) {
-        tasks[getLastPathPart(path)] = generate.bind(null, path);
-      });
-      async.parallel(tasks, function (error, results) {
-        if (error) return callback(error);
-        callback(null, _.assign(tree, results));
-      })
+      return Promise.all(data.folders.map(function (path) {
+        return generate(path).then(function (result) {
+          tree[getLastPathPart(path)] = result;
+        });
+      }))
+      .then(function () { return tree; });
     });
   }
 

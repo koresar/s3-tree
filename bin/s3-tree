@@ -10,11 +10,11 @@ if (!bucket) {
 }
 
 var s3tree = require('..');
-s3tree({bucket: bucket}).generate(path, function (error, tree) {
-  if (error) {
-    console.error(error.message);
-    process.exit(1);
-  }
-
+s3tree({bucket: bucket}).generate(path)
+.then(function (tree) {
   console.log(JSON.stringify(tree, null, 2));
+})
+.catch(function (error) {
+  console.error(error.message);
+  process.exit(1);
 });

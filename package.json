@@ -29,11 +29,11 @@
   },
   "homepage": "https://github.com/koresar/s3-tree#readme",
   "dependencies": {
-    "async": "^2.1.1",
     "lodash": "^4.16.4",
-    "s3-ls": "^1.0.1"
+    "s3-ls": "^2.0.0"
   },
   "devDependencies": {
+    "bluebird": "^3.5.0",
     "proxyquire": "^1.7.10",
     "tape": "^4.6.2"
   }
