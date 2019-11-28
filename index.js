@@ -1,33 +1,35 @@
-var _ = require('lodash');
-var s3ls = require('s3-ls');
+const s3ls = require("s3-ls");
+
+const trimEnd = (s, ch) =>
+  s[s.length - 1] === ch ? trimEnd(s.substr(0, s.length - 1), ch) : s;
 
 function getLastPathPart(path) {
-  return _.last(_.split(_.trim(path, '/'), '/'));
+  path = trimEnd(path, "/");
+  const lastIndex = path.lastIndexOf("/");
+  return path.substr(lastIndex + 1);
 }
 
-module.exports = function (options) {
-  var lister = s3ls(options);
+module.exports = function(options) {
+  const lister = s3ls(options);
 
   function generate(folder) {
-    return lister.ls(folder)
-    .then(function (data) {
-      var tree = {};
-      data.files.forEach(function (file) {
+    return lister.ls(folder).then(data => {
+      const tree = {};
+      data.files.forEach(file => {
         tree[getLastPathPart(file)] = file;
       });
 
-      if (_.isEmpty(data.folders)) return Promise.resolve(tree);
+      if (!data.folders || !data.folders.length) return Promise.resolve(tree);
 
-      return Promise.all(data.folders.map(function (path) {
-        return generate(path).then(function (result) {
-          tree[getLastPathPart(path)] = result;
-        });
-      }))
-      .then(function () { return tree; });
+      return Promise.all(
+        data.folders.map(path =>
+          generate(path).then(result => {
+            tree[getLastPathPart(path)] = result;
+          })
+        )
+      ).then(() => tree);
     });
   }
 
-  return {
-    generate: generate
-  };
+  return { generate };
 };
