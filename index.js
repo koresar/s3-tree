@@ -21,14 +21,14 @@ module.exports = function(options) {
 
       if (!data.folders || !data.folders.length) return Promise.resolve(tree);
 
-      const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
-
       return Promise.all(
         data.folders.map(path => {
           if (depth === 0) {
             tree[getLastPathPart(path)] = {};
             return Promise.resolve();
           }
+
+          const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
 
           return generate(path, reducedDepth).then(result => {
             tree[getLastPathPart(path)] = result;
