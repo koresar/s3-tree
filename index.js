@@ -12,18 +12,20 @@ function getLastPathPart(path) {
 module.exports = function(options) {
   const lister = s3ls(options);
 
-  function generate(folder) {
+  function generate(folder, depth) {
     return lister.ls(folder).then(data => {
       const tree = {};
       data.files.forEach(file => {
         tree[getLastPathPart(file)] = file;
       });
 
-      if (!data.folders || !data.folders.length) return Promise.resolve(tree);
+      if (!data.folders || !data.folders.length || depth === 0) return Promise.resolve(tree);
+
+      const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
 
       return Promise.all(
         data.folders.map(path =>
-          generate(path).then(result => {
+          generate(path, reducedDepth).then(result => {
             tree[getLastPathPart(path)] = result;
           })
         )

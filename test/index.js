@@ -131,3 +131,115 @@ test("should generate tree of folders and objects", t => {
     })
     .catch(t.end);
 });
+
+test("should accept depth as an optional argument for generate", t => {
+  const getProxyQuire = (st) => {
+    let counter = 0;
+    return proxyquire("..", {
+      "s3-ls": function s3ls() {
+        return {
+          ls(path) {
+            counter++;
+            if (counter === 4) {
+              st.equal(path, "folder/sub-folder/sub-sub-folder/");
+              return Promise.resolve({
+                files: [
+                  "folder/sub-folder/sub-sub-folder/file7",
+                  "folder/sub-folder/sub-sub-folder/file8"
+                ],
+                folders: []
+              });
+            }
+
+            if (counter === 3) {
+              st.equal(path, "folder/sub-folder/");
+              return Promise.resolve({
+                files: ["folder/sub-folder/file5", "folder/sub-folder/file6"],
+                folders: ["folder/sub-folder/sub-sub-folder/"]
+              });
+            }
+
+            if (counter === 2) {
+              st.equal(path, "folder/");
+              return Promise.resolve({
+                files: ["folder/file3", "folder/file4"],
+                folders: ["folder/sub-folder/"]
+              });
+            }
+
+            st.equal(path, "/");
+            return Promise.resolve({
+              files: ["file1", "file2"],
+              folders: ["folder/"]
+            });
+          }
+        };
+      }
+    });
+  }
+
+  t.test("should handle depth of 0", st => {
+    st.plan(2);
+    const s3tree = getProxyQuire(st);
+
+    s3tree()
+      .generate("/", 0)
+      .then(tree => {
+        st.deepEqual(tree, {
+          file1: "file1",
+          file2: "file2",
+        });
+      })
+      .catch(st.end);
+  });
+
+  t.test("should handle small positive depth", st => {
+    st.plan(4);
+    const s3tree = getProxyQuire(st);
+
+    s3tree()
+      .generate("/", 2)
+      .then(tree => {
+        st.deepEqual(tree, {
+          file1: "file1",
+          file2: "file2",
+          folder: {
+            file3: "folder/file3",
+            file4: "folder/file4",
+            "sub-folder": {
+              file5: "folder/sub-folder/file5",
+              file6: "folder/sub-folder/file6",
+            }
+          }
+      });
+      })
+      .catch(st.end);
+  });
+
+  t.test("should handle large positive depth", st => {
+    st.plan(5);
+    const s3tree = getProxyQuire(st);
+
+    s3tree()
+    .generate("/", 100)
+    .then(tree => {
+      st.deepEqual(tree, {
+        file1: "file1",
+        file2: "file2",
+        folder: {
+          file3: "folder/file3",
+          file4: "folder/file4",
+          "sub-folder": {
+            file5: "folder/sub-folder/file5",
+            file6: "folder/sub-folder/file6",
+            "sub-sub-folder": {
+              file7: "folder/sub-folder/sub-sub-folder/file7",
+              file8: "folder/sub-folder/sub-sub-folder/file8"
+            }
+          }
+        }
+      });
+    })
+    .catch(st.end);
+  });
+});
