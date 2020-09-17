@@ -188,6 +188,7 @@ test("should accept depth as an optional argument for generate", t => {
         st.deepEqual(tree, {
           file1: "file1",
           file2: "file2",
+          folder: {}
         });
       })
       .catch(st.end);
@@ -209,6 +210,7 @@ test("should accept depth as an optional argument for generate", t => {
             "sub-folder": {
               file5: "folder/sub-folder/file5",
               file6: "folder/sub-folder/file6",
+              "sub-sub-folder": {}
             }
           }
       });

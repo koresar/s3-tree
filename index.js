@@ -19,16 +19,21 @@ module.exports = function(options) {
         tree[getLastPathPart(file)] = file;
       });
 
-      if (!data.folders || !data.folders.length || depth === 0) return Promise.resolve(tree);
+      if (!data.folders || !data.folders.length) return Promise.resolve(tree);
 
       const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
 
       return Promise.all(
-        data.folders.map(path =>
-          generate(path, reducedDepth).then(result => {
+        data.folders.map(path => {
+          if (depth === 0) {
+            tree[getLastPathPart(path)] = {};
+            return Promise.resolve();
+          }
+
+          return generate(path, reducedDepth).then(result => {
             tree[getLastPathPart(path)] = result;
-          })
-        )
+          });
+        })
       ).then(() => tree);
     });
   }
