@@ -242,4 +242,31 @@ test("should accept depth as an optional argument for generate", t => {
     })
     .catch(st.end);
   });
+
+  t.test("should ignore if depth is negative", st => {
+    st.plan(5);
+    const s3tree = getProxyQuire(st);
+
+    s3tree()
+    .generate("/", -1)
+    .then(tree => {
+      st.deepEqual(tree, {
+        file1: "file1",
+        file2: "file2",
+        folder: {
+          file3: "folder/file3",
+          file4: "folder/file4",
+          "sub-folder": {
+            file5: "folder/sub-folder/file5",
+            file6: "folder/sub-folder/file6",
+            "sub-sub-folder": {
+              file7: "folder/sub-folder/sub-sub-folder/file7",
+              file8: "folder/sub-folder/sub-sub-folder/file8"
+            }
+          }
+        }
+      });
+    })
+    .catch(st.end);
+  });
 });
