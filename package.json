@@ -1,6 +1,6 @@
 {
   "name": "s3-tree",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Generates a tree of an S3 bucket contents",
   "main": "index.js",
   "bin": {
