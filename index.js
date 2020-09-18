@@ -12,7 +12,7 @@ function getLastPathPart(path) {
 module.exports = function(options) {
   const lister = s3ls(options);
 
-  function generate(folder) {
+  function generate(folder, depth) {
     return lister.ls(folder).then(data => {
       const tree = {};
       data.files.forEach(file => {
@@ -22,11 +22,18 @@ module.exports = function(options) {
       if (!data.folders || !data.folders.length) return Promise.resolve(tree);
 
       return Promise.all(
-        data.folders.map(path =>
-          generate(path).then(result => {
+        data.folders.map(path => {
+          if (depth === 0) {
+            tree[getLastPathPart(path)] = {};
+            return Promise.resolve();
+          }
+
+          const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
+
+          return generate(path, reducedDepth).then(result => {
             tree[getLastPathPart(path)] = result;
-          })
-        )
+          });
+        })
       ).then(() => tree);
     });
   }

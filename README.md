@@ -49,12 +49,13 @@ The `s3tree` accepts two options:
 - `bucket` - Obligatory. The S3 bucket name
 - `s3` - Optional. The `aws-sdk` S3 class instance. For example: `new AWS.S3({apiVersion: '2006-03-01')`
 
-The `s3tree.generate(path)` function takes:
+The `s3tree.generate(path, depth)` function takes:
 
 - `path` - any string. E.g.
   - `"/"`, `""`, or
   - `"/folder"`, `"folder/"`, `"folder"`, or
   - `"/1/2/3/4"`, `"1/2/3/4/"`, `"1/2/3/4"`, etc.
+- `depth` - Optional. The number of folders deep to traverse and generate. 0 will return only the direct contents of the folder.
 
 and returns a Promise.
 
