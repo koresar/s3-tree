@@ -3,15 +3,16 @@
 const args = process.argv.slice(2);
 const bucket = args[0];
 const path = args[1] || "";
+const depth = args[2];
 
 if (!bucket) {
-  console.error("Error! Wrong arguments. Usage: s3-tree bucket-name [path]");
+  console.error("Error! Wrong arguments. Usage: s3-tree bucket-name [path] [depth]");
   process.exit(1);
 }
 
 const s3tree = require("..");
 s3tree({ bucket })
-  .generate(path)
+  .generate(path, depth)
   .then(tree => {
     console.log(JSON.stringify(tree, null, 2));
   })

@@ -70,7 +70,13 @@ $ npm i -g s3-tree
 Usage:
 
 ```
-s3-tree BUCKET [PATH]
+s3-tree BUCKET [PATH] [DEPTH]
+```
+
+Example:
+
+```
+s3-tree my-cat-gifs / 10
 ```
 
 Prints JSON object (aka the tree). Example:
