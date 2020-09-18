@@ -133,7 +133,7 @@ test("should generate tree of folders and objects", t => {
 });
 
 test("should accept depth as an optional argument for generate", t => {
-  const getProxyQuire = (st) => {
+  const getProxyQuire = st => {
     let counter = 0;
     return proxyquire("..", {
       "s3-ls": function s3ls() {
@@ -176,7 +176,7 @@ test("should accept depth as an optional argument for generate", t => {
         };
       }
     });
-  }
+  };
 
   t.test("should handle depth of 0", st => {
     st.plan(2);
@@ -213,7 +213,7 @@ test("should accept depth as an optional argument for generate", t => {
               "sub-sub-folder": {}
             }
           }
-      });
+        });
       })
       .catch(st.end);
   });
@@ -223,26 +223,26 @@ test("should accept depth as an optional argument for generate", t => {
     const s3tree = getProxyQuire(st);
 
     s3tree()
-    .generate("/", 100)
-    .then(tree => {
-      st.deepEqual(tree, {
-        file1: "file1",
-        file2: "file2",
-        folder: {
-          file3: "folder/file3",
-          file4: "folder/file4",
-          "sub-folder": {
-            file5: "folder/sub-folder/file5",
-            file6: "folder/sub-folder/file6",
-            "sub-sub-folder": {
-              file7: "folder/sub-folder/sub-sub-folder/file7",
-              file8: "folder/sub-folder/sub-sub-folder/file8"
+      .generate("/", 100)
+      .then(tree => {
+        st.deepEqual(tree, {
+          file1: "file1",
+          file2: "file2",
+          folder: {
+            file3: "folder/file3",
+            file4: "folder/file4",
+            "sub-folder": {
+              file5: "folder/sub-folder/file5",
+              file6: "folder/sub-folder/file6",
+              "sub-sub-folder": {
+                file7: "folder/sub-folder/sub-sub-folder/file7",
+                file8: "folder/sub-folder/sub-sub-folder/file8"
+              }
             }
           }
-        }
-      });
-    })
-    .catch(st.end);
+        });
+      })
+      .catch(st.end);
   });
 
   t.test("should ignore if depth is negative", st => {
@@ -250,25 +250,25 @@ test("should accept depth as an optional argument for generate", t => {
     const s3tree = getProxyQuire(st);
 
     s3tree()
-    .generate("/", -1)
-    .then(tree => {
-      st.deepEqual(tree, {
-        file1: "file1",
-        file2: "file2",
-        folder: {
-          file3: "folder/file3",
-          file4: "folder/file4",
-          "sub-folder": {
-            file5: "folder/sub-folder/file5",
-            file6: "folder/sub-folder/file6",
-            "sub-sub-folder": {
-              file7: "folder/sub-folder/sub-sub-folder/file7",
-              file8: "folder/sub-folder/sub-sub-folder/file8"
+      .generate("/", -1)
+      .then(tree => {
+        st.deepEqual(tree, {
+          file1: "file1",
+          file2: "file2",
+          folder: {
+            file3: "folder/file3",
+            file4: "folder/file4",
+            "sub-folder": {
+              file5: "folder/sub-folder/file5",
+              file6: "folder/sub-folder/file6",
+              "sub-sub-folder": {
+                file7: "folder/sub-folder/sub-sub-folder/file7",
+                file8: "folder/sub-folder/sub-sub-folder/file8"
+              }
             }
           }
-        }
-      });
-    })
-    .catch(st.end);
+        });
+      })
+      .catch(st.end);
   });
 });

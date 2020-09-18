@@ -57,7 +57,7 @@ The `s3tree.generate(path, depth)` function takes:
   - `"/1/2/3/4"`, `"1/2/3/4/"`, `"1/2/3/4"`, etc.
 - `depth` - Optional. The number of folders deep to traverse and generate. 0 will return only the direct contents of the folder.
 
-and returns a Promise.
+Returns a Promise.
 
 # CLI
 
@@ -112,5 +112,9 @@ $
 ## v3.0
 
 - Dropped lodash dependency.
-- Modernised code from ES5->ES6. node.js < v8 are not supported
+- Modernised code from ES5->ES6. node.js < 8 are not supported
 - No API changes.
+
+## v3.1
+
+- New `depth` property to limit how much deep the tree should be traversed.

@@ -3,6 +3,12 @@ const s3ls = require("s3-ls");
 const trimEnd = (s, ch) =>
   s[s.length - 1] === ch ? trimEnd(s.substr(0, s.length - 1), ch) : s;
 
+const toSafeDepth = n => {
+  n = Number(n);
+  n = Number.isNaN(n) ? Number.MAX_SAFE_INTEGER : n;
+  return n >= 0 ? n : Number.MAX_SAFE_INTEGER;
+};
+
 function getLastPathPart(path) {
   path = trimEnd(path, "/");
   const lastIndex = path.lastIndexOf("/");
@@ -12,30 +18,25 @@ function getLastPathPart(path) {
 module.exports = function(options) {
   const lister = s3ls(options);
 
-  function generate(folder, depth) {
-    return lister.ls(folder).then(data => {
-      const tree = {};
-      data.files.forEach(file => {
-        tree[getLastPathPart(file)] = file;
-      });
+  async function generate(folder, depth) {
+    depth = toSafeDepth(depth);
 
-      if (!data.folders || !data.folders.length) return Promise.resolve(tree);
+    let data = await lister.ls(folder);
 
-      return Promise.all(
-        data.folders.map(path => {
-          if (depth === 0) {
-            tree[getLastPathPart(path)] = {};
-            return Promise.resolve();
-          }
-
-          const reducedDepth = (typeof depth === 'number' && depth > 0) ? depth - 1 : depth;
-
-          return generate(path, reducedDepth).then(result => {
-            tree[getLastPathPart(path)] = result;
-          });
-        })
-      ).then(() => tree);
+    const tree = {};
+    data.files.forEach(file => {
+      tree[getLastPathPart(file)] = file;
     });
+
+    if (data.folders && data.folders.length) {
+      await Promise.all(
+        data.folders.map(async path => {
+          tree[getLastPathPart(path)] =
+            depth > 0 ? await generate(path, depth - 1) : {};
+        })
+      );
+    }
+    return tree;
   }
 
   return { generate };
