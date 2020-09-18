@@ -1,6 +1,6 @@
 {
   "name": "s3-tree",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Generates a tree of an S3 bucket contents",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,8 @@
     "url": "git+https://github.com/koresar/s3-tree.git"
   },
   "files": [
-    "bin", "index.js"
+    "bin",
+    "index.js"
   ],
   "keywords": [
     "aws",
