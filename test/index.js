@@ -75,10 +75,7 @@ test("should generate tree of folders and objects", t => {
           if (counter === 4) {
             t.equal(path, "folder/sub-folder/sub-sub-folder/");
             return Promise.resolve({
-              files: [
-                "folder/sub-folder/sub-sub-folder/file7",
-                "folder/sub-folder/sub-sub-folder/file8"
-              ],
+              files: ["folder/sub-folder/sub-sub-folder/file7", "folder/sub-folder/sub-sub-folder/file8"],
               folders: []
             });
           }
@@ -143,10 +140,7 @@ test("should accept depth as an optional argument for generate", t => {
             if (counter === 4) {
               st.equal(path, "folder/sub-folder/sub-sub-folder/");
               return Promise.resolve({
-                files: [
-                  "folder/sub-folder/sub-sub-folder/file7",
-                  "folder/sub-folder/sub-sub-folder/file8"
-                ],
+                files: ["folder/sub-folder/sub-sub-folder/file7", "folder/sub-folder/sub-sub-folder/file8"],
                 folders: []
               });
             }

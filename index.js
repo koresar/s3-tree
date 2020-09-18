@@ -1,12 +1,11 @@
 const s3ls = require("s3-ls");
 
-const trimEnd = (s, ch) =>
-  s[s.length - 1] === ch ? trimEnd(s.substr(0, s.length - 1), ch) : s;
+const trimEnd = (s, ch) => (s[s.length - 1] === ch ? trimEnd(s.substr(0, s.length - 1), ch) : s);
 
 const toSafeDepth = n => {
   n = Number(n);
   n = Number.isNaN(n) ? Number.MAX_SAFE_INTEGER : n;
-  return n >= 0 ? n : Number.MAX_SAFE_INTEGER;
+  return n < 0 ? Number.MAX_SAFE_INTEGER : n;
 };
 
 function getLastPathPart(path) {
@@ -31,11 +30,11 @@ module.exports = function(options) {
     if (data.folders && data.folders.length) {
       await Promise.all(
         data.folders.map(async path => {
-          tree[getLastPathPart(path)] =
-            depth > 0 ? await generate(path, depth - 1) : {};
+          tree[getLastPathPart(path)] = depth > 0 ? await generate(path, depth - 1) : {};
         })
       );
     }
+
     return tree;
   }
 
